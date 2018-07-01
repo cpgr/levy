@@ -30,26 +30,30 @@ def C(alpha):
 
     return np.interp(alpha, x, y)
 
+# The stochastic variable v(alpha) (Eq. 6 from Mantegna, 1994)
+def vf(alpha):
+    # Sample two random number from the normal distribution N(0,1)
+    x = np.random.normal(0, 1)
+    y = np.random.normal(0, 1)
+
+    # Scale x by sigmax(alpha) so that it's standard deviation is sigmax
+    x = x * sigmax(alpha)
+
+    # The random variable v
+    return x / np.power(np.abs(y), 1.0 / alpha)
+
 # Calculates a single Levy stable random number with alpha and gamma
 def levy(alpha, gamma=1, n=1):
     # The Levy random number is found by a weighted average of n independent
     # random variables
     w = 0;
     for i in range(0,n):
-        # Sample two random number from the normal distribution N(0,1)
-        x = np.random.normal(0, 1)
-        y = np.random.normal(0, 1)
-
-        # Scale x by sigmax(alpha) so that it's standard deviation is sigmax
-        x = x * sigmax(alpha)
-
-        # The random variable v (Eq. 6 from Mantegna, 1994)
-        v = x / np.power(np.abs(y), 1.0 / alpha)
+        v = vf(alpha)
 
         # To avoid possible overflow in exp(-v/C) if v is a large negative number,
-        # clip the possible range of v to a specified large number
-        vmax = 1e2
-        v = np.clip(v, -vmax, vmax)
+        # get another v
+        while v < -10:
+            v = vf(alpha)
 
         # Transform random variable (Eq. 15 from Mantegna, 1994)
         w += v * ((K(alpha) - 1.0) * np.exp(-v / C(alpha)) + 1.0)
