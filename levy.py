@@ -59,6 +59,6 @@ def levy(alpha, gamma=1, n=1):
         w += v * ((K(alpha) - 1.0) * np.exp(-v / C(alpha)) + 1.0)
 
     # The Levy random variable is then
-    z = 1.0 / np.power(n, 1.0 / alpha) * w * np.power(gamma, 1.0 / alpha)
+    z = 1.0 / np.power(n, 1.0 / alpha) * w * gamma
 
     return z
